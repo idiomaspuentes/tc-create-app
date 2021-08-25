@@ -88,7 +88,7 @@ function LanguageSelect({ language, onLanguage }) {
   if (language) {
     value = orgOptions.filter((object) => object.value === language.languageId)[0];
   }
-  console.log("LanguageSelect() value,options=",value,orgOptions);
+
   return (
     <div className={classes.root}>
       {
