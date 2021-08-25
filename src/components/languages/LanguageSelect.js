@@ -65,8 +65,6 @@ function LanguageSelect({ language, onLanguage }) {
         const name = `${langId} - ${formattedLanguage.languageName} - ${formattedLanguage.localized}`;
         const gatewayLabel = `(${formattedLanguage.region} ${formattedLanguage.gateway ? 'Gateway' : 'Other'})`;
         label = `${name} ${gatewayLabel}`;
-      } else {
-        label = 'No Languages Found';
       }
       return { langId, label };
     }
@@ -90,21 +88,30 @@ function LanguageSelect({ language, onLanguage }) {
   if (language) {
     value = orgOptions.filter((object) => object.value === language.languageId)[0];
   }
-
+  console.log("LanguageSelect() value,options=",value,orgOptions);
   return (
     <div className={classes.root}>
-      <NoSsr>
-        <Select
-          className="language-select-dropdown"
-          classes={classes}
-          options={orgOptions}
-          components={components}
-          value={value}
-          onChange={handleChange}
-          placeholder="Select Language"
-        />
-        <div className={classes.divider} />
-      </NoSsr>
+      {
+        orgOptions[0].label === undefined ? 
+        (
+          <div><p>No Languages Found</p></div>
+        )
+        :
+        (
+          <NoSsr>
+            <Select
+              className="language-select-dropdown"
+              classes={classes}
+              options={orgOptions}
+              components={components}
+              value={value}
+              onChange={handleChange}
+              placeholder="Select Language"
+          />
+            <div className={classes.divider} />
+          </NoSsr>
+        )
+      }
     </div>
   );
 }
