@@ -46,7 +46,7 @@ function LanguageSelect({ language, onLanguage }) {
   const classes = useStyles();
 
   const handleChange = (object) => {
-    const languageId = object.value;
+    const languageId = object.langId;
     const _language = getLanguage({ languageId, languagesJSON: appContext.state.languages });
     onLanguage(_language);
   };

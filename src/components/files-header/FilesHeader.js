@@ -76,7 +76,7 @@ function FilesHeader({
     let licenseLink= sourceRepository.html_url + '/src/branch/' + sourceBranch + '/LICENSE.md';
 
     // test for translator role and override lable, dcs link and compare link
-    if ( full_name !== targetRepository.full_name ) {
+    if ( full_name !== targetRepository.full_name && sourceRepository?.catalog?.prod?.branch_or_tag_name) {
       // https://qa.door43.org/unfoldingWord/en_tn/src/tag/v47/en_tn_66-JUD.tsv
       const prodTag = sourceRepository.catalog.prod.branch_or_tag_name;
       label = `${sourceLanguage.languageName} - ${full_name}/${prodTag}`;

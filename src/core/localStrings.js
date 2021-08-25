@@ -22,6 +22,7 @@ const strings = {
     CompareSource:'Compare Master',
     OpenTargetText:'Go to Article',
     CompareTarget:'Compare Branch',
+    ConfirmCloseWindow: 'Are you sure you wish to close? Your changes will not be saved.',
     /* do not remove these two */
     StringMissing:'String Id missing',
     LangNotSupported: 'Language not supported',

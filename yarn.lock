@@ -5442,14 +5442,14 @@ data-urls@^1.0.0, data-urls@^1.1.0:
     whatwg-mimetype "^2.2.0"
     whatwg-url "^7.0.0"
 
-datatable-translatable@0.11.9:
-  version "0.11.9"
-  resolved "https://registry.yarnpkg.com/datatable-translatable/-/datatable-translatable-0.11.9.tgz#6a61e504e9848eb8ffefee8f92a113445d6c3434"
-  integrity sha512-WigZy3DZqIgs9ebfKYWlTHWhXjd56XivV9lD5Zr0sD1HIQEGmeSVdJK3tNUoVXFouV/YrGi0sUkFsKUELPSu2Q==
+datatable-translatable@0.11.10:
+  version "0.11.10"
+  resolved "https://registry.yarnpkg.com/datatable-translatable/-/datatable-translatable-0.11.10.tgz#9628efd97a113bac6b7801ec5f3989022d148096"
+  integrity sha512-VZY9+NgL0n/HPGrotDNBHIen2Ey5/8bemHaV/oitCyeKZzLmkOgWsVEO8tXCQ9Tr1pXnCmFn/srIjMC0wKIMZA==
   dependencies:
     deep-freeze "^0.0.1"
     lodash.isequal "^4.5.0"
-    markdown-translatable "1.2.16"
+    markdown-translatable "1.3.1"
     mui-datatables "3.3.1"
     use-deep-compare-effect "^1.3.1"
 
@@ -7573,10 +7573,10 @@ gitea-react-toolkit@1.6.4:
     use-deep-compare-effect "^1.3.1"
     utf8 "3.0.0"
 
-gitea-react-toolkit@1.9.1:
-  version "1.9.1"
-  resolved "https://registry.yarnpkg.com/gitea-react-toolkit/-/gitea-react-toolkit-1.9.1.tgz#98cb6711f00ca6546a48ee1a7c32409291ce4c65"
-  integrity sha512-BgS0nVqSphQJFbp5aTJhtuM0IizPGjrDvUAuD6TXoYncJXmXBO7PmnEQwY+YobV4UjN3uGomYIjBaPv5+3E2Rg==
+gitea-react-toolkit@1.9.3:
+  version "1.9.3"
+  resolved "https://registry.yarnpkg.com/gitea-react-toolkit/-/gitea-react-toolkit-1.9.3.tgz#0f1467087fbb814aa68f6f6bc695407c76cd3966"
+  integrity sha512-JubGD8xmLFTSa4unszKIohVxq/6N04mISkA7XekyuPhH1Bm3GBBScETO5zUyZD2x7YeOnUyqCo4lBNKS/6HD9Q==
   dependencies:
     awesome-debounce-promise "2.1.0"
     axios "0.19.0"
@@ -7584,7 +7584,7 @@ gitea-react-toolkit@1.9.1:
     base-64 "0.1.0"
     jszip "^3.5.0"
     localforage "1.7.3"
-    markdown-translatable "1.2.16"
+    markdown-translatable "1.3.1"
     prop-types "15.7.2"
     use-deep-compare-effect "^1.3.1"
     utf8 "3.0.0"
@@ -10616,6 +10616,20 @@ markdown-translatable@1.2.16:
     turndown "^7.0.0"
     turndown-plugin-gfm "^1.0.2"
 
+markdown-translatable@1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/markdown-translatable/-/markdown-translatable-1.3.1.tgz#29393f8650be38885c7991f2e2e661bbe9d000ae"
+  integrity sha512-oZieaVOCjxZISyGDvcpb3XsJsnPvKd4xCULFQawQ/L395EwGHFERG6gCH65b3w3HjkLEWhdPknWf1BLK6Mu6Tg==
+  dependencies:
+    deep-freeze "^0.0.1"
+    md5 "^2.2.1"
+    prop-types "^15.7.2"
+    react-headroom "^3.1.0"
+    react-markdown "4.0.6"
+    showdown "^1.9.1"
+    turndown "^7.0.0"
+    turndown-plugin-gfm "^1.0.2"
+
 md5.js@^1.3.4:
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/md5.js/-/md5.js-1.3.5.tgz#b5d07b8e3216e3e27cd728d72f70d1e6a342005f"
@@ -13332,6 +13346,14 @@ react-app-polyfill@^1.0.1:
     regenerator-runtime "^0.13.3"
     whatwg-fetch "^3.0.0"
 
+react-beforeunload@^2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/react-beforeunload/-/react-beforeunload-2.5.1.tgz#9e9592bc9a27fa1325b650a1e423be42312e2f30"
+  integrity sha512-X0PROB2sOTfue/8DEMIEIbfVWHlsLYuVOQ1s9StYOkrqocWX7wVJ1SErYXNw0I6zT1vTALm6oxsI7SO2B7AoGw==
+  dependencies:
+    prop-types "^15.7.2"
+    tiny-invariant "^1.1.0"
+
 react-dev-utils@^7.0.0:
   version "7.0.5"
   resolved "https://registry.yarnpkg.com/react-dev-utils/-/react-dev-utils-7.0.5.tgz#cb95375d01ae71ca27b3c7616006ef7a77d14e8e"
@@ -15649,6 +15671,11 @@ timsort@^0.3.0:
   resolved "https://registry.yarnpkg.com/timsort/-/timsort-0.3.0.tgz#405411a8e7e6339fe64db9a234de11dc31e02bd4"
   integrity sha1-QFQRqOfmM5/mTbmiNN4R3DHgK9Q=
 
+tiny-invariant@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/tiny-invariant/-/tiny-invariant-1.1.0.tgz#634c5f8efdc27714b7f386c35e6760991d230875"
+  integrity sha512-ytxQvrb1cPc9WBEI/HSeYYoGD0kWnGEOR8RY6KomWLBVhqz0RgTwVO9dLrGz7dC+nN9llyI7OKAgRq8Vq4ZBSw==
+
 tiny-relative-date@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/tiny-relative-date/-/tiny-relative-date-1.3.0.tgz#fa08aad501ed730f31cc043181d995c39a935e07"
@@ -16291,10 +16318,10 @@ uuid@^3.0.1, uuid@^3.3.2, uuid@^3.3.3, uuid@^3.4.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
 
-uw-content-validation@2.1.5:
-  version "2.1.5"
-  resolved "https://registry.yarnpkg.com/uw-content-validation/-/uw-content-validation-2.1.5.tgz#33ab876330dc7f45fb501fa47cb7109c82ced42d"
-  integrity sha512-LQSHw9DmIYvzCtP490HSMEZUWfYrFICrqglv07HH56SqM89osm3yfacIhprbuJRbZot6uxAHtdNQLZncCJgvfw==
+uw-content-validation@2.1.6:
+  version "2.1.6"
+  resolved "https://registry.yarnpkg.com/uw-content-validation/-/uw-content-validation-2.1.6.tgz#aa8f49c5e73a2ce577d77a1acdd341d3f8d54857"
+  integrity sha512-07cUsMpaI/Tg2KwDTvYIqJN4JAGu/a+ohJZLjAyrJwH1TuOMAYyqQL/5tucmkZxXpCxzs+UtpBVqMElXDP/TKg==
   dependencies:
     "@date-io/core" "^2.10.6"
     ajv "^6.12.6"

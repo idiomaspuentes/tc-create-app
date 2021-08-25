@@ -16,6 +16,7 @@ export function AppContextProvider({
   organization: __organization,
   children,
   resourceLinks: __resourceLinks,
+  contentIsDirty: __contentIsDirty
 }) {
   const [state, actions] = useStateReducer({
     authentication: __authentication,
@@ -24,6 +25,7 @@ export function AppContextProvider({
     filepath: __filepath,
     organization: __organization,
     resourceLinks: __resourceLinks,
+    contentIsDirty: __contentIsDirty,
   });
   // uw-languages-rcl
   const { state: languages } = useLanguages();

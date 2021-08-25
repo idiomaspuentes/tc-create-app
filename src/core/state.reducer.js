@@ -35,6 +35,9 @@ export const stateReducer = (state, action) => {
   case 'set_resource_links':
     _state['resourceLinks'] = value;
     break;
+  case 'set_content_is_dirty':
+    _state['contentIsDirty'] = value;
+    break;
   case 'set_validation_priority':
     _state['validationPriority'] = value;
     break;

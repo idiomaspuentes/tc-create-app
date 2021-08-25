@@ -53,7 +53,7 @@ const onOpenValidationTsvGeneric = (content, link, tsvHeader, numColumns, idcolu
     let firstdiff = -1;
     let maxlength = Math.max(tsvHeader.length, rows[0].length);
     for ( let i=0; i < maxlength; i++ ) {
-      console.log("s vs t:", tsvHeader[i], rows[0][i]);
+      //console.log("s vs t:", tsvHeader[i], rows[0][i]);
       if ( tsvHeader.charCodeAt(i) !== rows[0].charCodeAt(i) ) {
         firstdiff = i;
         break;

@@ -12,6 +12,7 @@ export const useStateReducer = ({
   filepath,
   organization,
   resourceLinks,
+  contentIsDirty,
 }) => {
   const _defaults = {
     ...defaults,
@@ -21,6 +22,7 @@ export const useStateReducer = ({
     filepath,
     organization,
     resourceLinks,
+    contentIsDirty,
   };
   const [state, dispatch] = useReducer(stateReducer, _defaults);
 
@@ -163,6 +165,16 @@ export const useStateReducer = ({
     [state.resourceLinks]
   );
 
+  const setContentIsDirty = useCallback(
+    (value) => {
+      if (value !== state.contentIsDirty) {
+        dispatch({ type: 'set_content_is_dirty', value });
+        saveState('contentIsDirty', value);
+      }
+    },
+    [state.contentIsDirty]
+  );
+
   const actions = {
     setAuthentication,
     setLanguage,
@@ -170,6 +182,7 @@ export const useStateReducer = ({
     setExpandedScripture,
     setConfig,
     setResourceLinks,
+    setContentIsDirty,
     setSourceRepository,
     setTargetRepository,
     setTargetRepoFromSourceRepo,
