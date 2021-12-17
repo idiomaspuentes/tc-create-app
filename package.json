@@ -54,7 +54,7 @@
     "uw-tsv-parser": "1.0.2-rc.1"
   },
   "devDependencies": {
-    "@cypress/code-coverage": "3.9.2",
+    "@cypress/code-coverage": "3.9.12",
     "@rescripts/cli": "^0.0.16",
     "@rescripts/rescript-env": "^0.0.12",
     "@testing-library/react-hooks": "^5.1.0",
