@@ -1,5 +1,5 @@
 import React, {
-  useState, useCallback, useContext, useMemo, useEffect,
+  useState, useCallback, useContext, useMemo, useEffect, useRef,
 } from 'react';
 
 import { CircularProgress } from '@material-ui/core';
@@ -168,14 +168,30 @@ function TranslatableTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
     setTimeout( () => _onValidate(rows), 1);
   }, [_onValidate]);
 
+  const tableRef = useRef(null);
+  const [table, setTable] = useState(null);
+  const [pageChanged, setPageChanged] = useState(null);
+
+  useEffect(() => {
+    setTable(tableRef.current);
+    console.log({ tableRef, pageChanged });
+  }, [pageChanged]);
 
   const [options, setOptions] = useState({
     page: 0,
     rowsPerPage: 25,
     rowsPerPageOptions: [10, 25, 50, 100],
+    onTableChange: function (action, tableState) {
+      console.log({ tableChange: { action, tableState } });
+    },
+    setTableProps: () => (
+      { ref: tableRef }
+    ),
+    onChangePage: ( ) => setPageChanged(true),
   });
 
   const [columns, setColumns] = useState();
+  const [highlightText, setHighlightText] = useState(null);
 
   useEffect(() => {
     if (!columns && targetFile.content) {
@@ -199,6 +215,12 @@ function TranslatableTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
 
   useEffect(() => {
     if (queryParams && columns) {
+      const checkText = queryParams.get('check');
+
+      if (checkText) {
+        setHighlightText(checkText);
+      }
+
       const queryColumns = queryParams.get('columns')?.split(',');
       const validColumns = columns.map(column => queryColumns && queryColumns.includes(column) && column) || [];
 
@@ -213,6 +235,47 @@ function TranslatableTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
       ];
     }
   }, [queryParams, columns]);
+
+  const highLight = useCallback(() => {
+    let wrappersList = [];
+    console.log({ highlightText, table });
+
+    if (highlightText && table) {
+      const key = highlightText;
+      const elements = table.querySelectorAll('[contenteditable=true]');
+      console.log({ elements });
+
+      for (const element of elements) {
+        if (element.textContent.includes(key)) {
+          console.log(element.innerHTML);
+          const wrapper = element.cloneNode();
+          wrappersList = [...wrappersList, wrapper];
+          wrapper.classList.add('hl');
+          wrapper.contentEditable = false;
+
+          const text = element.innerHTML;
+          const pattern = new RegExp(key, 'g');
+          const newText = text.replace(pattern, (found) => {
+            console.log(found);
+            const words = found.split(' ');
+            console.log(words);
+            const newWords = words.map((word) => `<span class="wrd">${word}</span>`);
+            return newWords.join(' ');
+          });
+          console.log(newText);
+          wrapper.innerHTML = newText;
+          element.parentNode.insertBefore(wrapper, element);
+        }
+      }
+    }
+    return wrappersList;
+  }, [highlightText, table]);
+
+  useEffect(() => {
+    const wrappers = highLight();
+    console.log(wrappers);
+    return () => wrappers?.forEach(wrapper => wrapper.remove());
+  }, [highLight]);
 
   const rowHeader = useCallback((rowData, actionsMenu) => (<RowHeader
     open={expandedScripture}
@@ -239,7 +302,7 @@ function TranslatableTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
       />
     );
   }, [sourceFile.content, targetFile.content, onSave, onEdit, onValidate, onContentIsDirty, generateRowId, options, rowHeader]);
-
+  console.log(datatable);
   return (
     <>
     <ResourcesContextProvider

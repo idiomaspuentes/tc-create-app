@@ -20,3 +20,19 @@ code {
 h1, h2, h3, h6 {
   margin: 0.2%;
 }
+
+.wrd {
+  background: rgb(255 178 112 / 41%);
+  box-shadow: 0px -3px 0px 0px rgb(208 77 0 / 22%) inset;
+}
+
+.hl {
+  position: absolute;
+  color: transparent;
+  z-index: -1;
+  width: auto!important;
+  height: auto!important;
+}
+.hl *:not(span.wrd) {
+  color: transparent;
+}
