@@ -33,23 +33,45 @@ function Translatable() {
   const classes = useStyles();
   //const [wrapperElement, setWrapperElement] = useState(null);
 
-  const { state: {config, language, sourceRepository, targetRepository, filepath}, actions: {setContentIsDirty} } = useContext(AppContext);
+  const { state: {config, language, sourceRepository, targetRepository, filepath, organization}, actions: {setContentIsDirty} } = useContext(AppContext);
 
-  const { actions: authenticationActions } = useContext(AuthenticationContext);
+  const { actions: authenticationActions, state: authentication } = useContext(AuthenticationContext);
+  const [permalink, setPermalink] = useState();
 
   const [savingTargetFileContent, setSavingTargetFileContent] = useState();
   const [doSaveRetry, setDoSaveRetry] = useState(false);
-
+  const [errorMessage, setErrorMessage] = useState('Error! File was not saved.  Connection to the server was lost.');
   const [isAuthenticationModalVisible, setAuthenticationModalVisible] = useState(false);
   const closeAuthenticationModal = () => setAuthenticationModalVisible(false);
   const openAuthenticationModal = () => setAuthenticationModalVisible(true);
-
 
   const { state: sourceFile } = useContext(FileContext);
 
   const { state: targetFile, actions: targetFileActions } = useContext(
     TargetFileContext
   );
+
+  useEffect(() => {
+    if (!authentication) {
+      setAuthenticationModalVisible(true);
+      setErrorMessage('Login to load file.');
+    }
+
+    const currentPL = window.location.pathname;
+
+    //TODO: Compare current window.location with permalink to avoid history duplication.
+    if (organization?.username && language?.languageId && sourceRepository?.name && filepath) {
+      setPermalink(`/pl/${organization.username}/${language.languageId}/${sourceRepository.name.split('_')[1]}/${filepath}`);
+    }
+
+    if (permalink && currentPL !== permalink) {
+      window.history.pushState(
+        { id: permalink },
+        filepath,
+        permalink
+      );
+    }
+  }, [authentication, organization.username, language.languageId, sourceRepository.name, filepath, permalink]);
 
   useEffect(() => {
     // This does not work in the saveRetry() function.
@@ -61,11 +83,11 @@ function Translatable() {
           // Saved successfully.
           closeAuthenticationModal();
         },
-          () => {
-            // Error saving:
-            closeAuthenticationModal();
-            alert("Error saving file! File could not be saved.");
-          });
+        () => {
+          // Error saving:
+          closeAuthenticationModal();
+          alert('Error saving file! File could not be saved.');
+        });
     }
   }, [doSaveRetry, targetFileActions, savingTargetFileContent]);
 
@@ -85,14 +107,14 @@ function Translatable() {
               config={config}
               authentication={null/** Override to simulate logged out. */}
               actionText={'Login to try again...'}
-              errorText={'Error! File was not saved.  Connection to the server was lost.'}
+              errorText={errorMessage}
               onSubmit={saveRetry}
             />
           </Paper>
         </Modal>
       )
     );
-  }, [config, isAuthenticationModalVisible, classes.modal, authenticationActions]);
+  }, [config, isAuthenticationModalVisible, classes.modal, authenticationActions, errorMessage]);
 
   const scrollToTop = useCallback(() => {
     window.scrollTo(0, 0);

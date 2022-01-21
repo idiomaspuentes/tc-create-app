@@ -5546,6 +5546,13 @@ dayjs@^1.9.3:
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.10.6.tgz#288b2aa82f2d8418a6c9d4df5898c0737ad02a63"
   integrity sha512-AztC/IOW4L1Q41A86phW5Thhcrco3xuAA+YX/BLpLWWjRcTj5TOt/QImBLmCKlrF7u7k47arTnOyL6GnbG8Hvw==
 
+dcs-js@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/dcs-js/-/dcs-js-1.0.2.tgz#cc2bc762cd47f1e65328da2d156db7ae4e27fcc4"
+  integrity sha512-rqbzXeiwL+Eb6G0WIWtjLVubCkKrqtAkOcUZLtGsv21Pj/gMH3YzEdZoMdisojEX2ZbkqTWEPDUzQ+DI9Sywqw==
+  dependencies:
+    axios "^0.21.1"
+
 debounce-promise@^3.1.0:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/debounce-promise/-/debounce-promise-3.1.2.tgz#320fb8c7d15a344455cd33cee5ab63530b6dc7c5"

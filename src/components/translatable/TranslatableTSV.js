@@ -1,5 +1,5 @@
 import React, {
-  useState, useCallback, useContext, useMemo,
+  useState, useCallback, useContext, useMemo, useEffect,
 } from 'react';
 
 import { CircularProgress } from '@material-ui/core';
@@ -23,6 +23,7 @@ import RowHeader from './RowHeader';
 
 import * as cv from 'uw-content-validation';
 import * as csv from '../../core/csvMaker';
+import usePermalink from '../../hooks/usePermalink';
 
 const delimiters = { row: '\n', cell: '\t' };
 const _config = {
@@ -38,6 +39,7 @@ function TranslatableTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
   // manage the state of the resources for the provider context
   const [resources, setResources] = useState([]);
   const [open, setOpen] = React.useState(false);
+  const { queryParams } = usePermalink();
 
   const {
     state: { resourceLinks, expandedScripture, validationPriority, organization },
@@ -48,9 +50,9 @@ function TranslatableTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
   const { state: targetFile } = useContext(
     TargetFileContext
   );
-
+  console.log(targetFile);
   const bookId = sourceFile.filepath.split(/\d+-|\./)[1].toLowerCase();
-  
+
   const onResourceLinks = useCallback(
     (_resourceLinks) => {
       // Remove bookId and remove defaults:
@@ -166,11 +168,51 @@ function TranslatableTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
     setTimeout( () => _onValidate(rows), 1);
   }, [_onValidate]);
 
-  const options = {
+
+  const [options, setOptions] = useState({
     page: 0,
     rowsPerPage: 25,
     rowsPerPageOptions: [10, 25, 50, 100],
-  };
+  });
+
+  const [columns, setColumns] = useState();
+
+  useEffect(() => {
+    if (!columns && targetFile.content) {
+      setColumns(targetFile.content.slice(0, targetFile.content.indexOf('\n')).split('\t'));
+    }
+  }, [columns, targetFile.content]);
+
+  useEffect(() => {
+    const exludedFromSearch = ['columns', 'check'];
+
+    if (queryParams) {
+      //Sets searchText to first searchable param in query string.
+      for (let key of queryParams.keys()) {
+        if (!exludedFromSearch.includes(key) && !options.searchText) {
+          console.log(queryParams.get(key));
+          setOptions({ ...options, searchText: queryParams.get(key) });
+        }
+      }
+    }
+  },[options, queryParams]);
+
+  useEffect(() => {
+    if (queryParams && columns) {
+      const queryColumns = queryParams.get('columns')?.split(',');
+      const validColumns = columns.map(column => queryColumns && queryColumns.includes(column) && column) || [];
+
+      const columnsShowDefault = columns.map(column =>
+        queryParams.get(column) && column
+      );
+
+      _config.columnsShowDefault = [
+        ..._config.columnsShowDefault,
+        ...columnsShowDefault,
+        ...validColumns,
+      ];
+    }
+  }, [queryParams, columns]);
 
   const rowHeader = useCallback((rowData, actionsMenu) => (<RowHeader
     open={expandedScripture}
