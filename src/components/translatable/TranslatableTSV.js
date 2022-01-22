@@ -3,13 +3,16 @@ import React, {
 } from 'react';
 
 import { CircularProgress } from '@material-ui/core';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
+import {
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button,
+} from '@material-ui/core';
 
 import { DataTable } from 'datatable-translatable';
 
 import { ResourcesContextProvider, ResourcesContext } from 'scripture-resources-rcl';
 import { FileContext } from 'gitea-react-toolkit';
 
+import * as cv from 'uw-content-validation';
 import {
   defaultResourceLinks,
   stripDefaultsFromResourceLinks,
@@ -19,11 +22,11 @@ import { SERVER_URL } from '../../core/state.defaults';
 import { TargetFileContext } from '../../core/TargetFile.context';
 
 import { AppContext } from '../../App.context';
-import RowHeader from './RowHeader';
 
-import * as cv from 'uw-content-validation';
 import * as csv from '../../core/csvMaker';
 import usePermalink from '../../hooks/usePermalink';
+import useHighlighter from '../../hooks/useHighlighter';
+import RowHeader from './RowHeader';
 
 const delimiters = { row: '\n', cell: '\t' };
 const _config = {
@@ -35,14 +38,18 @@ const _config = {
   ],
 };
 
-function TranslatableTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
+function TranslatableTSVWrapper({
+  onSave, onEdit, onContentIsDirty,
+}) {
   // manage the state of the resources for the provider context
   const [resources, setResources] = useState([]);
   const [open, setOpen] = React.useState(false);
   const { queryParams } = usePermalink();
 
   const {
-    state: { resourceLinks, expandedScripture, validationPriority, organization },
+    state: {
+      resourceLinks, expandedScripture, validationPriority, organization,
+    },
     actions: { setResourceLinks },
   } = useContext(AppContext);
 
@@ -85,12 +92,11 @@ function TranslatableTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
 
   const serverConfig = {
     server: SERVER_URL,
-    cache: {
-      maxAge: 1 * 1 * 1 * 60 * 1000, // override cache to 1 minute
+    cache: { maxAge: 1 * 1 * 1 * 60 * 1000, // override cache to 1 minute
     },
   };
 
-  const handleClose = useCallback( () => {
+  const handleClose = useCallback(() => {
     setOpen(false);
   }, [setOpen]);
 
@@ -99,57 +105,64 @@ function TranslatableTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
     // NOTE! the content on-screen, in-memory does NOT include
     // the headers. So the initial value of tsvRows will be
     // the headers.
-    if ( targetFile && rows ) {
-      const _name  = targetFile.name.split('_');
+    if (targetFile && rows) {
+      const _name = targetFile.name.split('_');
       const langId = _name[0];
       const bookID = _name[2].split('-')[1].split('.')[0];
-      let rowsString = "Book\tChapter\tVerse\tID\tSupportReference\tOrigQuote\tOccurrence\tGLQuote\tOccurrenceNote\n";
-      for (let i=0; i < rows.length; i++) {
-        let rowString = "";
-        for (let j=0; j < rows[i].length; j++) {
+      let rowsString = 'Book\tChapter\tVerse\tID\tSupportReference\tOrigQuote\tOccurrence\tGLQuote\tOccurrenceNote\n';
+
+      for (let i = 0; i < rows.length; i++) {
+        let rowString = '';
+
+        for (let j = 0; j < rows[i].length; j++) {
           rowString += rows[i][j];
-          if ( j < (rows[i].length-1) ) {
+
+          if (j < (rows[i].length - 1)) {
             rowString += '\t';
           }
         }
         rowsString += rowString;
         rowsString += '\n';
       }
-      // const rawResults = await cv.checkTN_TSV9Table(langId, 'TN', bookID, 'dummy', rowsString, '', {suppressNoticeDisablingFlag: false});      
-      const rawResults = await cv.checkDeprecatedTN_TSV9Table(organization.username, langId, bookID, targetFile.name, rowsString,  {suppressNoticeDisablingFlag: false})
+
+      // const rawResults = await cv.checkTN_TSV9Table(langId, 'TN', bookID, 'dummy', rowsString, '', {suppressNoticeDisablingFlag: false});
+      const rawResults = await cv.checkDeprecatedTN_TSV9Table(organization.username, langId, bookID, targetFile.name, rowsString, { suppressNoticeDisablingFlag: false });
       const nl = rawResults.noticeList;
-      let hdrs =  ['Priority','Chapter','Verse','Line','Row ID','Details','Char Pos','Excerpt','Message','Location'];
+      let hdrs = ['Priority', 'Chapter', 'Verse', 'Line', 'Row ID', 'Details', 'Char Pos', 'Excerpt', 'Message', 'Location'];
       let data = [];
       data.push(hdrs);
       let inPriorityRange = false;
-      Object.keys(nl).forEach ( key => {
+
+      Object.keys(nl).forEach(key => {
         inPriorityRange = false; // reset for each
         const rowData = nl[key];
-        if ( validationPriority === 'med' && rowData.priority > 599 ) {
+
+        if (validationPriority === 'med' && rowData.priority > 599) {
           inPriorityRange = true;
-        } else if ( validationPriority === 'high' && rowData.priority > 799 ) {
+        } else if (validationPriority === 'high' && rowData.priority > 799) {
           inPriorityRange = true;
-        } else if ( validationPriority === 'low' ) {
+        } else if (validationPriority === 'low') {
           inPriorityRange = true;
         }
-        if ( inPriorityRange ) {
-          csv.addRow( data, [
-              String(rowData.priority),
-              String(rowData.C),
-              String(rowData.V),
-              String(rowData.lineNumber),
-              String(rowData.rowID),
-              String(rowData.fieldName || ""),
-              String(rowData.characterIndex || ""),
-              String(rowData.extract || ""),
-              String(rowData.message),
-              String(rowData.location),
-          ])
+
+        if (inPriorityRange) {
+          csv.addRow(data, [
+            String(rowData.priority),
+            String(rowData.C),
+            String(rowData.V),
+            String(rowData.lineNumber),
+            String(rowData.rowID),
+            String(rowData.fieldName || ''),
+            String(rowData.characterIndex || ''),
+            String(rowData.extract || ''),
+            String(rowData.message),
+            String(rowData.location),
+          ]);
         }
       });
 
-      if ( data.length < 2 ) {
-        alert("No Validation Errors Found");
+      if (data.length < 2) {
+        alert('No Validation Errors Found');
         setOpen(false);
         return;
       }
@@ -157,41 +170,43 @@ function TranslatableTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
       let ts = new Date().toISOString();
       let fn = 'Validation-' + targetFile.name + '-' + ts + '.csv';
       csv.download(fn, csv.toCSV(data));
-  
+
       //setOpen(false);
     }
     setOpen(false);
-  },[targetFile, validationPriority, organization.username]);
+  }, [targetFile, validationPriority, organization.username]);
 
-  const onValidate = useCallback( (rows) => {
+  const onValidate = useCallback((rows) => {
     setOpen(true);
-    setTimeout( () => _onValidate(rows), 1);
+    setTimeout(() => _onValidate(rows), 1);
   }, [_onValidate]);
 
   const tableRef = useRef(null);
   const [table, setTable] = useState(null);
-  const [pageChanged, setPageChanged] = useState(null);
+  const [tableChanged, setTableChanged] = useState(null);
+  const { addPhrase } = useHighlighter({ table, tableChanged });
 
   useEffect(() => {
-    setTable(tableRef.current);
-    console.log({ tableRef, pageChanged });
-  }, [pageChanged]);
+    if (tableChanged) {
+      console.log('settingTable');
+      setTable(tableRef.current);
+    }
+    console.log({ tableRef, tableChanged });
+  }, [tableChanged]);
 
   const [options, setOptions] = useState({
     page: 0,
     rowsPerPage: 25,
     rowsPerPageOptions: [10, 25, 50, 100],
     onTableChange: function (action, tableState) {
-      console.log({ tableChange: { action, tableState } });
+      setTableChanged(tableState);
     },
     setTableProps: () => (
       { ref: tableRef }
     ),
-    onChangePage: ( ) => setPageChanged(true),
   });
 
   const [columns, setColumns] = useState();
-  const [highlightText, setHighlightText] = useState(null);
 
   useEffect(() => {
     if (!columns && targetFile.content) {
@@ -218,7 +233,8 @@ function TranslatableTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
       const checkText = queryParams.get('check');
 
       if (checkText) {
-        setHighlightText(checkText);
+        console.log('sending phrase');
+        addPhrase({ phrase: checkText, message: 'test message' });
       }
 
       const queryColumns = queryParams.get('columns')?.split(',');
@@ -234,48 +250,8 @@ function TranslatableTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
         ...validColumns,
       ];
     }
-  }, [queryParams, columns]);
+  }, [queryParams, columns, addPhrase]);
 
-  const highLight = useCallback(() => {
-    let wrappersList = [];
-    console.log({ highlightText, table });
-
-    if (highlightText && table) {
-      const key = highlightText;
-      const elements = table.querySelectorAll('[contenteditable=true]');
-      console.log({ elements });
-
-      for (const element of elements) {
-        if (element.textContent.includes(key)) {
-          console.log(element.innerHTML);
-          const wrapper = element.cloneNode();
-          wrappersList = [...wrappersList, wrapper];
-          wrapper.classList.add('hl');
-          wrapper.contentEditable = false;
-
-          const text = element.innerHTML;
-          const pattern = new RegExp(key, 'g');
-          const newText = text.replace(pattern, (found) => {
-            console.log(found);
-            const words = found.split(' ');
-            console.log(words);
-            const newWords = words.map((word) => `<span class="wrd">${word}</span>`);
-            return newWords.join(' ');
-          });
-          console.log(newText);
-          wrapper.innerHTML = newText;
-          element.parentNode.insertBefore(wrapper, element);
-        }
-      }
-    }
-    return wrappersList;
-  }, [highlightText, table]);
-
-  useEffect(() => {
-    const wrappers = highLight();
-    console.log(wrappers);
-    return () => wrappers?.forEach(wrapper => wrapper.remove());
-  }, [highLight]);
 
   const rowHeader = useCallback((rowData, actionsMenu) => (<RowHeader
     open={expandedScripture}
@@ -315,14 +291,14 @@ function TranslatableTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
       config={serverConfig}
     >
       <TranslatableTSV datatable={datatable} />
-      {open &&  <Dialog
+      {open && <Dialog
         disableBackdropClick
         open={open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Validation Running, Please Wait"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{'Validation Running, Please Wait'}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             <div style={{ textAlign: 'center' }}>
@@ -331,12 +307,12 @@ function TranslatableTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button data-test-id="KNdmPAULAWTECbgCLgyJy" onClick={handleClose} color="primary">
             Close
           </Button>
         </DialogActions>
       </Dialog>
-    }
+      }
     </ResourcesContextProvider>
     </>
   );

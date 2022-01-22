@@ -21,18 +21,22 @@ h1, h2, h3, h6 {
   margin: 0.2%;
 }
 
-.wrd {
-  background: rgb(255 178 112 / 41%);
-  box-shadow: 0px -3px 0px 0px rgb(208 77 0 / 22%) inset;
+.hl-word {
+  background: #ffdad7;
+  box-shadow: 0px -3px 0px 0px #ff4739 inset;
 }
 
-.hl {
+.hl-container {
   position: absolute;
   color: transparent;
   z-index: -1;
   width: auto!important;
   height: auto!important;
 }
-.hl *:not(span.wrd) {
+.hl-container *:not(span.hl-word) {
   color: transparent;
+}
+
+code.hl-container {
+    display: inline-block!important;
 }

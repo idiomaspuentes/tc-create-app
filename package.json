@@ -50,6 +50,7 @@
     "scripture-resources-rcl": "4.1.9",
     "use-deep-compare-effect": "^1.3.1",
     "usfm-js": "^2.1.0",
+    "uuidv4": "^6.2.12",
     "uw-content-validation": "3.1.0",
     "uw-languages-rcl": "1.0.0",
     "uw-tsv-parser": "1.0.2-rc.1"
