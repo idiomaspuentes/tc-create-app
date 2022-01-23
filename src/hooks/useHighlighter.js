@@ -20,7 +20,7 @@ const useHighlighter = ({
   function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
   }
-  console.log({ table });
+
   const [highlightAdded, setHighlightAdded] = useState(false);
   const [_phrases, setPhrases] = useState([]);
 
@@ -36,8 +36,6 @@ const useHighlighter = ({
   * @param {string} [newPhrase.message] - The message to show in popup.
   */
   const addPhrase = (newPhrase) => {
-    console.log('adding phrase');
-
     if (!_phrases.some(({ phrase }) => phrase === newPhrase.phrase)){
       setPhrases([..._phrases, { ...newPhrase, id: uuid().slice(1, 6) }]);
     }
@@ -54,13 +52,11 @@ const useHighlighter = ({
 
   const highlightContainer = useCallback((element, phrases, regexp) => {
     const getNewContent = (content, phrases, regexp) => {
-      console.log('getting new content');
       let anyAreFound = false;
       const newContent = content.replaceAll(regexp, (found) => {
         anyAreFound = true;
         const words = found.split(' ');
         const phrase = phrases.find(({ phrase }) => phrase === found);
-        console.log(phrase.id);
         const newWords = words.map((word) => `<span aria-describedby="popper-${phrase.id}" class="phrase-${phrase.id} hl-word">${word}</span>`);
         return newWords.join(' ');
       });
@@ -76,7 +72,6 @@ const useHighlighter = ({
       wrapper.innerHTML = newContent;
       element.parentNode.style.position = 'relative';
       element.parentNode.insertBefore(wrapper, element);
-      console.log('adding new event listener');
       const onInput = (e) => {
         wrapper.innerHTML = getNewContent(e.target.innerHTML, phrases, regexp);
       };
@@ -111,12 +106,9 @@ const useHighlighter = ({
     let wrappers = [];
 
     if (table && _phrases.length > 0 && tableChanged) {
-      console.log({ _phrases });
       wrappers = highLight(_phrases);
-      console.log({ wrappers });
     }
     return () => wrappers && wrappers?.forEach(({ wrapper, onInput }) => {
-      console.log('cleaning mess.');
       wrapper.removeEventListener('input', onInput);
       wrapper.remove();
     });
