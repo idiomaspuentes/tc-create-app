@@ -2,7 +2,7 @@ import React, {
   useCallback, useEffect, useState, useMemo,
 } from 'react';
 
-import { uuid } from 'uuidv4';
+import { v4 as uuid } from 'uuid';
 import HighlightPopper from './HighlightPopper';
 
 /**

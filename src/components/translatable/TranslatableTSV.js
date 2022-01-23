@@ -2,9 +2,8 @@ import React, {
   useState, useCallback, useContext, useMemo, useEffect, useRef,
 } from 'react';
 
-import { CircularProgress } from '@material-ui/core';
 import {
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button,
+  CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button,
 } from '@material-ui/core';
 
 import { DataTable } from 'datatable-translatable';
