@@ -57,7 +57,7 @@ function TranslatableTSVWrapper({
   const { state: targetFile } = useContext(
     TargetFileContext
   );
-  console.log(targetFile);
+
   const bookId = sourceFile.filepath.split(/\d+-|\./)[1].toLowerCase();
 
   const onResourceLinks = useCallback(
@@ -92,8 +92,7 @@ function TranslatableTSVWrapper({
 
   const serverConfig = {
     server: SERVER_URL,
-    cache: { maxAge: 1 * 1 * 1 * 60 * 1000, // override cache to 1 minute
-    },
+    cache: { maxAge: 1 * 1 * 1 * 60 * 1000 /* override cache to 1 minute */},
   };
 
   const handleClose = useCallback(() => {
@@ -184,14 +183,12 @@ function TranslatableTSVWrapper({
   const tableRef = useRef(null);
   const [table, setTable] = useState(null);
   const [tableChanged, setTableChanged] = useState(null);
-  const { addPhrase } = useHighlighter({ table, tableChanged });
+  const { addPhrase, poppers } = useHighlighter({ table, tableChanged });
 
   useEffect(() => {
     if (tableChanged) {
-      console.log('settingTable');
       setTable(tableRef.current);
     }
-    console.log({ tableRef, tableChanged });
   }, [tableChanged]);
 
   const [options, setOptions] = useState({
@@ -215,13 +212,12 @@ function TranslatableTSVWrapper({
   }, [columns, targetFile.content]);
 
   useEffect(() => {
-    const exludedFromSearch = ['columns', 'check'];
+    const exludedFromSearch = ['columns', 'check', 'hint'];
 
     if (queryParams) {
       //Sets searchText to first searchable param in query string.
       for (let key of queryParams.keys()) {
         if (!exludedFromSearch.includes(key) && !options.searchText) {
-          console.log(queryParams.get(key));
           setOptions({ ...options, searchText: queryParams.get(key) });
         }
       }
@@ -231,10 +227,12 @@ function TranslatableTSVWrapper({
   useEffect(() => {
     if (queryParams && columns) {
       const checkText = queryParams.get('check');
+      const hint = queryParams.get('hint');
+      const message = () => hint && (<><b>Hint:</b> {hint}</>);
 
       if (checkText) {
-        console.log('sending phrase');
-        addPhrase({ phrase: checkText, message: 'test message' });
+        addPhrase({ phrase: checkText, message: message() });
+        // addPhrase({ phrase: 'sustantivo abstracto', message: 'test message' });
       }
 
       const queryColumns = queryParams.get('columns')?.split(',');
@@ -278,7 +276,6 @@ function TranslatableTSVWrapper({
       />
     );
   }, [sourceFile.content, targetFile.content, onSave, onEdit, onValidate, onContentIsDirty, generateRowId, options, rowHeader]);
-  console.log(datatable);
   return (
     <>
     <ResourcesContextProvider
@@ -291,6 +288,7 @@ function TranslatableTSVWrapper({
       config={serverConfig}
     >
       <TranslatableTSV datatable={datatable} />
+      {poppers}
       {open && <Dialog
         disableBackdropClick
         open={open}

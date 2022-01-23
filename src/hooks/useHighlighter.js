@@ -1,7 +1,9 @@
-import {
-  useCallback, useEffect, useState,
+import React, {
+  useCallback, useEffect, useState, useMemo,
 } from 'react';
+
 import { uuid } from 'uuidv4';
+import HighlightPopper from './HighlightPopper';
 
 /**
  * Highlights given phrases contained in given HtmlElement
@@ -19,6 +21,7 @@ const useHighlighter = ({
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
   }
   console.log({ table });
+  const [highlightAdded, setHighlightAdded] = useState(false);
   const [_phrases, setPhrases] = useState([]);
 
   if (phrases) {
@@ -58,7 +61,7 @@ const useHighlighter = ({
         const words = found.split(' ');
         const phrase = phrases.find(({ phrase }) => phrase === found);
         console.log(phrase.id);
-        const newWords = words.map((word) => `<span id="${phrase.id}" class="hl-word">${word}</span>`);
+        const newWords = words.map((word) => `<span aria-describedby="popper-${phrase.id}" class="phrase-${phrase.id} hl-word">${word}</span>`);
         return newWords.join(' ');
       });
       return anyAreFound && newContent;
@@ -87,12 +90,18 @@ const useHighlighter = ({
 
     const pattern = phrases.map(({ phrase }) => escapeRegExp(phrase)).join('|');
     const regexp = new RegExp(pattern, 'g');
+    const elements = document.querySelectorAll('[contenteditable=true]');
+    setHighlightAdded(false);
 
-    for (const element of document.querySelectorAll('[contenteditable=true]')) {
+    for (const element of elements) {
       const wrapper = highlightContainer(element, phrases, regexp);
 
       if (wrapper) {
         wrappersList = [...wrappersList, wrapper];
+      }
+
+      if (element === elements[elements.length - 1]) {
+        setHighlightAdded(true);
       }
     }
     return wrappersList;
@@ -104,7 +113,6 @@ const useHighlighter = ({
     if (table && _phrases.length > 0 && tableChanged) {
       console.log({ _phrases });
       wrappers = highLight(_phrases);
-      console.log(' repair ');
       console.log({ wrappers });
     }
     return () => wrappers && wrappers?.forEach(({ wrapper, onInput }) => {
@@ -114,7 +122,12 @@ const useHighlighter = ({
     });
   }, [highLight, table, _phrases, tableChanged]);
 
-  return { removePhrase, addPhrase };
+  const poppers = useMemo(() => highlightAdded && <>{_phrases.map(({ id, message }) => message && <HighlightPopper key={id} id={id} message={message}></HighlightPopper>)}</>
+    ,[_phrases, highlightAdded]);
+
+  return {
+    removePhrase, addPhrase, poppers,
+  };
 };
 
 export default useHighlighter;
