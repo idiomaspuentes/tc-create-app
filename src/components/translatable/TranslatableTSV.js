@@ -180,22 +180,17 @@ function TranslatableTSVWrapper({
   }, [_onValidate]);
 
   const tableRef = useRef(null);
-  const [table, setTable] = useState(null);
-  const [tableChanged, setTableChanged] = useState(null);
-  const { addPhrase, poppers } = useHighlighter({ table, tableChanged });
+  const [table, setTable] = useState({ ref: null, state: null });
+  const { addPhrase, poppers } = useHighlighter({ container: table });
 
-  useEffect(() => {
-    if (tableChanged) {
-      setTable(tableRef.current);
-    }
-  }, [tableChanged]);
 
   const [options, setOptions] = useState({
     page: 0,
     rowsPerPage: 25,
     rowsPerPageOptions: [10, 25, 50, 100],
     onTableChange: function (action, tableState) {
-      setTableChanged(tableState);
+      console.log('table changed');
+      setTable({ ref: tableRef.current, state: tableState });
     },
     setTableProps: () => (
       { ref: tableRef }

@@ -8,15 +8,15 @@ import HighlightPopper from './HighlightPopper';
 /**
  * Highlights given phrases contained in given HtmlElement
  * @constructor
- * @param {HTMLElement} table - The title of the book.
+ * @param {Object[]} container - The global container in which phrases should be searched.
+ * @param {HtmlElement} ref - The ference to the container.
+ * @param {Object} state - The state of the container. So highlighting can be redone for each state change.
  * @param {Object[]} phrases - The author of the book.
  * @param {string} phrases[].phrase - The phrase to highlight.
  * @param {string} [phrases[].message] - The message to show in popup.
  * @returns {Array} - Array of utility functions (addPhrase, removePhrase).
  */
-const useHighlighter = ({
-  table, phrases, tableChanged,
-}) => {
+const useHighlighter = ({ container, phrases }) => {
   function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
   }
@@ -80,12 +80,12 @@ const useHighlighter = ({
     }
   },[]);
 
-  const highLight = useCallback((phrases) => {
+  const highLight = useCallback((phrases, container) => {
     let wrappersList = [];
 
     const pattern = phrases.map(({ phrase }) => escapeRegExp(phrase)).join('|');
     const regexp = new RegExp(pattern, 'g');
-    const elements = document.querySelectorAll('[contenteditable=true]');
+    const elements = container.querySelectorAll('[contenteditable=true]');
     setHighlightAdded(false);
 
     for (const element of elements) {
@@ -105,14 +105,14 @@ const useHighlighter = ({
   useEffect(() => {
     let wrappers = [];
 
-    if (table && _phrases.length > 0 && tableChanged) {
-      wrappers = highLight(_phrases);
+    if (container?.ref && _phrases.length > 0) {
+      wrappers = highLight(_phrases, container?.ref);
     }
     return () => wrappers && wrappers?.forEach(({ wrapper, onInput }) => {
       wrapper.removeEventListener('input', onInput);
       wrapper.remove();
     });
-  }, [highLight, table, _phrases, tableChanged]);
+  }, [highLight, container, _phrases]);
 
   const poppers = useMemo(() => highlightAdded && <>{_phrases.map(({ id, message }) => message && <HighlightPopper key={id} id={id} message={message}></HighlightPopper>)}</>
     ,[_phrases, highlightAdded]);
