@@ -40,3 +40,8 @@ h1, h2, h3, h6 {
 code.hl-container {
     display: inline-block!important;
 }
+
+/* Added z-index 1 so sticky headers don't go under highlights */
+td[class^=MuiTableCell-root]:nth-child(1) {
+    z-index: 1;
+}
