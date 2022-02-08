@@ -1,9 +1,8 @@
 import React, {
-  useState, useCallback, useContext, useMemo,
+  useState, useCallback, useContext, useMemo, useEffect, useRef,
 } from 'react';
 
-import { CircularProgress } from '@material-ui/core';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
+import { CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
 
 import { DataTable } from 'datatable-translatable';
 import * as parser from 'uw-tsv-parser';
@@ -23,6 +22,9 @@ import { TargetFileContext } from '../../core/TargetFile.context';
 
 import { AppContext } from '../../App.context';
 import RowHeaderObsTn from './RowHeaderObsTn';
+
+import usePermalink from '../../hooks/usePermalink';
+import useHighlighter from '../../hooks/useHighlighter';
 
 import * as cv from 'uw-content-validation';
 import * as csv from '../../core/csvMaker';
@@ -46,6 +48,7 @@ function TranslatableObsTnTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
   // manage the state of the resources for the provider context
   const [resources, setResources] = useState([]);
   const [open, setOpen] = React.useState(false);
+  const { queryParams } = usePermalink();
 
   const {
     state: { resourceLinks, expandedScripture, validationPriority, targetRepository, organization },
@@ -140,11 +143,72 @@ function TranslatableObsTnTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
   }, [_onValidate]);
 
 
-  const options = {
+
+  const tableRef = useRef(null);
+  const [table, setTable] = useState({ ref: null, state: null });
+  const { addPhrase, poppers } = useHighlighter({ container: table });
+
+
+  const [options, setOptions] = useState({
     page: 0,
     rowsPerPage: 25,
     rowsPerPageOptions: [10, 25, 50, 100],
-  };
+    onTableChange: function (action, tableState) {
+      console.log('table changed');
+      setTable({ ref: tableRef.current, state: tableState });
+    },
+    setTableProps: () => (
+      { ref: tableRef }
+    ),
+  });
+
+  const [columns, setColumns] = useState();
+
+  useEffect(() => {
+    if (!columns && targetFile.content) {
+      setColumns(targetFile.content.slice(0, targetFile.content.indexOf('\n')).split('\t'));
+    }
+  }, [columns, targetFile.content]);
+
+  useEffect(() => {
+    const exludedFromSearch = ['columns', 'check', 'hint'];
+
+    if (queryParams) {
+      //Sets searchText to first searchable param in query string.
+      for (let key of queryParams.keys()) {
+        if (!exludedFromSearch.includes(key) && !options.searchText) {
+          setOptions({ ...options, searchText: queryParams.get(key) });
+        }
+      }
+    }
+  },[options, queryParams]);
+
+  useEffect(() => {
+    if (queryParams && columns) {
+      const checkText = queryParams.get('check');
+      const hint = queryParams.get('hint');
+      const message = () => hint && (<><b>Hint:</b> {hint}</>);
+
+      if (checkText) {
+        addPhrase({ phrase: checkText, message: message() });
+        // addPhrase({ phrase: 'sustantivo abstracto', message: 'test message' });
+      }
+
+      const queryColumns = queryParams.get('columns')?.split(',');
+      const validColumns = columns.map(column => queryColumns && queryColumns.includes(column) && column) || [];
+
+      const columnsShowDefault = columns.map(column =>
+        queryParams.get(column) && column
+      );
+
+      _config.columnsShowDefault = [
+        ..._config.columnsShowDefault,
+        ...columnsShowDefault,
+        ...validColumns,
+      ];
+    }
+  }, [queryParams, columns, addPhrase]);
+
 
   const rowHeader = useCallback((rowData, actionsMenu) => (<RowHeaderObsTn
     bookId={bookId}
@@ -186,6 +250,7 @@ function TranslatableObsTnTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
       config={serverConfig}
     >
       <TranslatableObsTnTSV datatable={datatable} />
+      {poppers}
       {open &&  <Dialog
         disableBackdropClick
         open={open}

@@ -1,5 +1,5 @@
 import React, {
-  useState, useCallback, useContext, useMemo,
+  useState, useCallback, useContext, useMemo, useEffect, useRef,
 } from 'react';
 
 import { DataTable } from 'datatable-translatable';
@@ -21,6 +21,9 @@ import { TargetFileContext } from '../../core/TargetFile.context';
 
 import { AppContext } from '../../App.context';
 import RowHeaderObsTq from './RowHeaderObsTq';
+
+import usePermalink from '../../hooks/usePermalink';
+import useHighlighter from '../../hooks/useHighlighter';
 
 import * as parser from 'uw-tsv-parser';
 import * as cv from 'uw-content-validation';
@@ -139,11 +142,71 @@ function TranslatableObsTqTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
     setTimeout( () => _onValidate(rows), 1);
   }, [_onValidate]);
 
-  const options = {
+  const { queryParams } = usePermalink();
+  const tableRef = useRef(null);
+  const [table, setTable] = useState({ ref: null, state: null });
+  const { addPhrase, poppers } = useHighlighter({ container: table });
+
+
+  const [options, setOptions] = useState({
     page: 0,
     rowsPerPage: 10,
     rowsPerPageOptions: [10, 25, 50, 100],
-  };
+    onTableChange: function (action, tableState) {
+      console.log('table changed');
+      setTable({ ref: tableRef.current, state: tableState });
+    },
+    setTableProps: () => (
+      { ref: tableRef }
+    ),
+  });
+
+  const [columns, setColumns] = useState();
+
+  useEffect(() => {
+    if (!columns && targetFile.content) {
+      setColumns(targetFile.content.slice(0, targetFile.content.indexOf('\n')).split('\t'));
+    }
+  }, [columns, targetFile.content]);
+
+  useEffect(() => {
+    const exludedFromSearch = ['columns', 'check', 'hint'];
+
+    if (queryParams) {
+      //Sets searchText to first searchable param in query string.
+      for (let key of queryParams.keys()) {
+        if (!exludedFromSearch.includes(key) && !options.searchText) {
+          setOptions({ ...options, searchText: queryParams.get(key) });
+        }
+      }
+    }
+  },[options, queryParams]);
+
+  useEffect(() => {
+    if (queryParams && columns) {
+      const checkText = queryParams.get('check');
+      const hint = queryParams.get('hint');
+      const message = () => hint && (<><b>Hint:</b> {hint}</>);
+
+      if (checkText) {
+        addPhrase({ phrase: checkText, message: message() });
+        // addPhrase({ phrase: 'sustantivo abstracto', message: 'test message' });
+      }
+
+      const queryColumns = queryParams.get('columns')?.split(',');
+      const validColumns = columns.map(column => queryColumns && queryColumns.includes(column) && column) || [];
+
+      const columnsShowDefault = columns.map(column =>
+        queryParams.get(column) && column
+      );
+
+      _config.columnsShowDefault = [
+        ..._config.columnsShowDefault,
+        ...columnsShowDefault,
+        ...validColumns,
+      ];
+    }
+  }, [queryParams, columns, addPhrase]);
 
   const rowHeader = useCallback((rowData, actionsMenu) => (<RowHeaderObsTq
       bookId={bookId}
@@ -185,6 +248,7 @@ function TranslatableObsTqTSVWrapper({ onSave, onEdit, onContentIsDirty }) {
       config={serverConfig}
     >
       <TranslatableObsTqTSV datatable={datatable} />
+      {poppers}
       {open &&  <Dialog
         disableBackdropClick
         open={open}
